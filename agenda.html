@@ -67,8 +67,9 @@
 
   <!-- <script src="agenda.js"></script>-->
   <script>
+    //Paso 1. Modelar los datos i Paso 2. Crear el array de contactos
     //Array de objetos (Base de datos)
-const agenda = [
+const agenda = [ //Es podria declarar variable amb let, conceptualment? Tenint en compte que la modificarem.
     {
         id: 1,
         nombre: "Ana López",
@@ -92,6 +93,7 @@ const agenda = [
     }
 ];
 
+//Paso 3. Mostrar los datos (Read)
 //Función contactos
 
 function mostrarContactos() {
@@ -119,17 +121,8 @@ function mostrarContactos() {
 
 mostrarContactos();
 
-//Crear contactos urgentes - unshift
-function agregarUrgente() {
-    const contacto = obtenerDatosFormulario();
-    if (!contacto) return;
-
-    agenda.unshift(contacto);
-    limpiarFormulario();
-    mostrarContactos();
-};
-
-//Crear contactos nuevos - push
+//Paso 4. Crear un contacto (CREATE con push)
+//Crear contactos nuevos - push (afegir un element al final de l'array)
 function agregarContacto() {
     const contacto = obtenerDatosFormulario();
     if (!contacto) return;
@@ -139,7 +132,19 @@ function agregarContacto() {
     mostrarContactos();
 };
 
-//Esborrar darrer contacte
+//Paso 5. Crear un contacto urgente (unshift)
+//Crear contactos urgentes - unshift (afegir un contacte prioritari al principi de l'array)
+function agregarUrgente() {
+    const contacto = obtenerDatosFormulario();
+    if (!contacto) return;
+
+    agenda.unshift(contacto);
+    limpiarFormulario();
+    mostrarContactos();
+};
+
+//Paso 6. Deshacer el último contacto (pop)
+//Esborrar darrer contacte - pop (eliminar l'últim contacte de l'array)
 function deshacerUltimo() {
     if (agenda.length === 0) return;
 
@@ -147,8 +152,8 @@ function deshacerUltimo() {
     mostrarContactos();
 };
 
-
-//Esborrar primer contacte
+//Paso 7. Atender el primer contacto (shift)
+//Esborrar primer contacte - shift (eliminar el primer contacte de l'array)
 function atenderPrimero() {
     if (agenda.length === 0) return;
 
@@ -156,8 +161,26 @@ function atenderPrimero() {
     mostrarContactos();
 };
 
+//Paso 8. Eliminar un contacto concreto (findIndex)
+//Eliminar contactes - findIndex (eliminar un contacte de l'array per l'id)
+function eliminarContacto(id) {
+    const index = agenda.findIndex(c => c.id === id);
+    if (index !== -1) {
+        agenda.splice(index, 1);
+        mostrarContactos();
+    }
+}
 
+//Altres. 
+//Netejar formulari 
+function limpiarFormulario() {
+    document.getElementById("nombre").value = "";
+    document.getElementById("telefono").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("empresa").value = "";
+}
 
+//Paso 9. Crear objetos desde formularios i Paso 10. Validar datos antes de usarlos
 //Obtenir les dades del formulari
 function obtenerDatosFormulario(){
     const nombre = document.getElementById("nombre").value.trim(); //Important que surti trim per treure espais extres, perquè no ho desi amb espais.
@@ -178,6 +201,8 @@ function obtenerDatosFormulario(){
         empresa
     }
 }
+
+
 
   </script>
 </body>
