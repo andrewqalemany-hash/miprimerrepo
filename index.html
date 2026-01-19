@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Agenda de Contactos</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+  <h1 class="text-center mb-4">📒 Agenda de Contactos</h1>
+
+  <!-- FORMULARIO -->
+  <div class="card mb-4 shadow">
+    <div class="card-body">
+      <h5 class="card-title">Contacto</h5>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <input type="text" id="nombre" class="form-control" placeholder="Nombre">
+        </div>
+        <div class="col-md-6">
+          <input type="text" id="telefono" class="form-control" placeholder="Teléfono">
+        </div>
+        <div class="col-md-6">
+          <input type="email" id="email" class="form-control" placeholder="Email">
+        </div>
+        <div class="col-md-6">
+          <input type="text" id="empresa" class="form-control" placeholder="Empresa">
+        </div>
+      </div>
+
+      <div class="mt-3 d-flex gap-2 flex-wrap">
+        <button class="btn btn-primary" onclick="agregarContacto()">Añadir (push)</button>
+        <button class="btn btn-success" onclick="agregarUrgente()">Añadir urgente (unshift)</button>
+        <button class="btn btn-warning" onclick="deshacerUltimo()">Deshacer último (pop)</button>
+        <button class="btn btn-secondary" onclick="atenderPrimero()">Atender primero (shift)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="card shadow">
+    <div class="card-body">
+      <h5 class="card-title">Listado</h5>
+
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Nombre</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Empresa</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaContactos"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  /********************************************************
+   * PASO 1 y 2 · Modelo de datos + array de contactos
+   ********************************************************/
+
+  // Array 
+  let agenda = [
+    {
+      id: 1,
+      nombre: "Ana López",
+      telefono: "600123123",
+      email: "ana@mail.com",
+      empresa: "TechSoft"
+    }
+  ];
+
+  // Contador para generar IDs únicos automáticamente
+  let contadorId = 2;
+
+  /********************************************************
+   * PASO 3 · Mostrar contactos (READ)
+   ********************************************************/
+
+  // Función que pinta la agenda en la tabla HTML
+  function mostrarContactos() {
+    // Seleccionamos el cuerpo de la tabla
+    const tabla = document.getElementById("tablaContactos");
+
+    // Limpiamos la tabla para evitar duplicados
+    tabla.innerHTML = "";
+
+    // Recorremos el array agenda contacto por contacto
+    agenda.forEach(contacto => {
+      // Añadimos una fila por cada contacto
+      tabla.innerHTML += ` 
+        <tr>
+          <td>${contacto.nombre}</td>
+          <td>${contacto.telefono}</td>
+          <td>${contacto.email}</td>
+          <td>${contacto.empresa}</td>
+          <td>
+            <button class="btn btn-sm btn-danger"
+              onclick="eliminarContacto(${contacto.id})">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  /********************************************************
+   * Funciones auxiliares (formularios)
+   ********************************************************/
+
+  // Recoge los datos escritos en el formulario
+  function obtenerDatosFormulario() {
+    return {
+      // Asignamos un ID nuevo y lo incrementamos
+      id: contadorId++,
+      // Leemos el valor del input nombre
+      nombre: document.getElementById("nombre").value.trim,
+      // Leemos el valor del input teléfono
+      telefono: document.getElementById("telefono").value.trim,
+      // Leemos el valor del input email
+      email: document.getElementById("email").value.trim,
+      // Leemos el valor del input empresa
+      empresa: document.getElementById("empresa").value.trim
+    };
+  }
+
+  // Vacía los campos del formulario
+  function limpiarFormulario() {
+    document.getElementById("nombre").value = "";
+    document.getElementById("telefono").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("empresa").value = "";
+  }
+
+  /********************************************************
+   * PASO 4 · Crear contacto (CREATE con push)
+   ********************************************************/
+
+  // Añade un contacto al final del array
+  function agregarContacto() {
+    // Creamos el objeto contacto con los datos del formulario
+    const contacto = obtenerDatosFormulario();
+
+    // push añade el contacto al final del array agenda
+    agenda.push(contacto);
+
+    // Limpiamos el formulario
+    limpiarFormulario();
+
+    // Actualizamos la tabla
+    mostrarContactos();
+  }
+
+  /********************************************************
+   * PASO 5 · Crear contacto urgente (unshift)
+   ********************************************************/
+
+  // Añade un contacto al inicio del array
+  function agregarUrgente() {
+    // Creamos el objeto contacto
+    const contacto = obtenerDatosFormulario();
+
+    // unshift añade el contacto al principio del array
+    agenda.unshift(contacto);
+
+    // Limpiamos el formulario
+    limpiarFormulario();
+
+    // Actualizamos la tabla
+    mostrarContactos();
+  }
+
+  /********************************************************
+   * PASO 6 · Deshacer último contacto (pop)
+   ********************************************************/
+
+  // Elimina el último contacto añadido
+  function deshacerUltimo() {
+    // pop elimina el último elemento del array
+    agenda.pop();
+
+    // Volvemos a mostrar la tabla
+    mostrarContactos();
+  }
+
+  /********************************************************
+   * PASO 7 · Atender el primer contacto (shift)
+   ********************************************************/
+
+  // Elimina el primer contacto de la agenda
+  function atenderPrimero() {
+    // shift elimina el primer elemento del array
+    agenda.shift();
+
+    // Actualizamos la tabla
+    mostrarContactos();
+  }
+
+  /********************************************************
+   * Función extra · Eliminar contacto por ID
+   ********************************************************/
+
+  // Elimina un contacto concreto usando su ID
+  function eliminarContacto(id) {
+    // filter crea un nuevo array sin el contacto eliminado
+    agenda = agenda.filter(contacto => contacto.id !== id);
+
+    // Actualizamos la tabla
+    mostrarContactos();
+  }
+
+  /********************************************************
+   * Inicialización
+   ********************************************************/
+
+  // Mostramos los contactos iniciales al cargar la página
+  mostrarContactos();
+</script>
+
+</body>
+</html>
