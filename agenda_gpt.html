@@ -1,0 +1,208 @@
+<!DOCTYPE html> <!-- Defineix document HTML5 -->
+<html lang="es"> <!-- Idioma del document -->
+
+<head>
+  <meta charset="UTF-8"> <!-- Permet accents i caràcters especials -->
+  <title>Agenda de Contactos Mejorada</title> <!-- Títol de la pestanya -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Disseny responsive -->
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap: evita fer CSS manual -->
+</head>
+
+<body class="bg-light"> <!-- Fons clar amb Bootstrap -->
+
+  <div class="container mt-5"> <!-- Contenidor centrat amb marge superior -->
+    <h1 class="text-center mb-4">📒 Agenda de Contactos</h1> <!-- Títol centrat -->
+
+    <!-- FORMULARI -->
+    <div class="card mb-4 shadow">
+      <div class="card-body">
+        <h5 class="card-title">Contacto</h5>
+
+        <div class="row g-3"> <!-- Files amb separació -->
+          <div class="col-12 col-md-6">
+            <input type="text" id="nombre" class="form-control" placeholder="Nombre">
+            <!-- Input nom -->
+          </div>
+          <div class="col-12 col-md-6">
+            <input type="text" id="telefono" class="form-control" placeholder="Teléfono">
+            <!-- Input telèfon -->
+          </div>
+          <div class="col-12 col-md-6">
+            <input type="email" id="email" class="form-control" placeholder="Email">
+            <!-- Input email -->
+          </div>
+          <div class="col-12 col-md-6">
+            <input type="text" id="empresa" class="form-control" placeholder="Empresa">
+            <!-- Input empresa -->
+          </div>
+        </div>
+
+        <div class="mt-3 d-flex gap-2 flex-wrap">
+          <button class="btn btn-primary" onclick="agregarContacto()">Añadir (push)</button>
+          <!-- Afegeix contacte al final -->
+
+          <button class="btn btn-success" onclick="agregarUrgente()">Añadir urgente (unshift)</button>
+          <!-- Afegeix contacte al principi -->
+
+          <button class="btn btn-warning" onclick="deshacerUltimo()">Deshacer último (pop)</button>
+          <!-- Elimina l’últim contacte -->
+
+          <button class="btn btn-secondary" onclick="atenderPrimero()">Atender primero (shift)</button>
+          <!-- Elimina el primer contacte -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAULA -->
+    <div class="card shadow">
+      <div class="card-body">
+        <h5 class="card-title">Listado</h5>
+
+        <table class="table table-striped table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th>Email</th>
+              <th>Empresa</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaContactos"></tbody>
+          <!-- El JS omple aquesta part -->
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // PASO 1 i 2: Modelar dades i crear l’array de contactes
+    let agenda = [ 
+      // MILLORA: usem let en lloc de const per poder reassignar l’array si cal
+      { id: 1, nombre: "Ana López", telefono: "600123123", email: "ana@mail.com", empresa: "TechSoft" },
+      { id: 2, nombre: "Carlos Pérez", telefono: "699456456", email: "carlos@mail.com", empresa: "Innova" },
+      { id: 3, nombre: "Oscar Burgos", telefono: "666666666", email: "mihifide@gmail.com", empresa: "Freelance" }
+    ];
+
+    let siguienteId = 4;
+    // MILLORA: substitueix Date.now()
+    // IDs incrementals → mai duplicats, més realista
+
+    // PASO 3: Mostrar contactes (READ)
+    function mostrarContactos() {
+      const tbody = document.getElementById("tablaContactos"); // Selecciona el tbody
+      tbody.innerHTML = ""; // Neteja la taula abans de pintar-la
+
+      agenda.forEach(contacto => { // Recorre l’array sense modificar-lo
+        tbody.innerHTML += `
+          <tr>
+            <td>${contacto.nombre}</td>
+            <td>${contacto.telefono}</td>
+            <td>${contacto.email}</td>
+            <td>${contacto.empresa}</td>
+            <td>
+              <button class="btn btn-danger btn-sm"
+                onclick="eliminarContacto(${contacto.id})">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    mostrarContactos(); // Mostra els contactes inicials
+
+    // PASO 4: Crear contacte (push)
+    function agregarContacto() {
+      const contacto = obtenerDatosFormulario(); // Obté dades validades
+      if (!contacto) return; // Si hi ha error, no continua
+
+      agenda.push(contacto); // Afegeix al final
+      limpiarFormulario();   // Neteja inputs
+      mostrarContactos();    // Actualitza la taula
+    }
+
+    // PASO 5: Crear contacte urgent (unshift)
+    function agregarUrgente() {
+      const contacto = obtenerDatosFormulario();
+      if (!contacto) return;
+
+      agenda.unshift(contacto); // Afegeix al principi
+      limpiarFormulario();
+      mostrarContactos();
+    }
+
+    // PASO 6: Desfer últim contacte (pop)
+    function deshacerUltimo() {
+      if (agenda.length === 0) return; // Evita errors
+      agenda.pop(); // Elimina l’últim
+      mostrarContactos();
+    }
+
+    // PASO 7: Atendre primer contacte (shift)
+    function atenderPrimero() {
+      if (agenda.length === 0) return;
+      agenda.shift(); // Elimina el primer
+      mostrarContactos();
+    }
+
+    // PASO 8: Eliminar contacte concret per ID
+    function eliminarContacto(id) {
+      const index = agenda.findIndex(c => c.id === id);
+      // MILLORA: elimina per ID, no per posició
+
+      if (index !== -1) {
+        agenda.splice(index, 1); // Elimina exactament 1 element
+        mostrarContactos();
+      }
+    }
+
+    // Netejar formulari
+    function limpiarFormulario() {
+      document.getElementById("nombre").value = "";
+      document.getElementById("telefono").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("empresa").value = "";
+    }
+
+    // PASOS 9 i 10: Crear objectes des del formulari + validar
+    function obtenerDatosFormulario() {
+      const nombre = document.getElementById("nombre").value.trim(); // trim elimina espais
+      const telefono = document.getElementById("telefono").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const empresa = document.getElementById("empresa").value.trim();
+
+      // Validació bàsica (PASO 10)
+      if (!nombre || !telefono || !email || !empresa) {
+        alert("Todos los campos son obligatorios");
+        return null;
+      }
+
+      // MILLORA: validar format email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert("Email no válido");
+        return null;
+      }
+
+      // MILLORA: validar telèfon (només números, mínim 6)
+      const telRegex = /^\d{6,}$/;
+      if (!telRegex.test(telefono.replace(/\s+/g, ""))) {
+        alert("Teléfono no válido");
+        return null;
+      }
+
+      return {
+        id: siguienteId++, // MILLORA: ID incremental únic
+        nombre,
+        telefono,
+        email,
+        empresa
+      };
+    }
+  </script>
+</body>
+</html>
